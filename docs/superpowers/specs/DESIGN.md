@@ -21,58 +21,37 @@
 
 組織はフラット（2ロールのみ）。承認フローなし。
 
-## テーブル定義
+## 技術スタック
 
-### `users`（営業マスタ）
+| カテゴリ | 採用技術 | 備考 |
+| --- | --- | --- |
+| フレームワーク | Next.js（TypeScript） | App Router。フロント・API を一体管理 |
+| DB / ORM | PostgreSQL + Prisma | 型安全スキーマ・マイグレーション管理 |
+| 認証 | NextAuth.js | middleware でセッション検証・ロールガード |
+| ホスティング | Vercel | CI/CD・プレビューデプロイ込み |
 
-| カラム | 型 | 制約 | 説明 |
-| --- | --- | --- | --- |
-| id | bigint | PK | |
-| name | varchar | NOT NULL | |
-| email | varchar | NOT NULL, UNIQUE | ログインID |
-| password_hash | varchar | NOT NULL | |
-| role | enum | NOT NULL | `sales` / `manager` |
-| created_at / updated_at | timestamp | NOT NULL | |
+## アーキテクチャ
 
-### `customers`（顧客マスタ）
+API は `app/api/` Route Handlers（REST）。未認証は `/login` へリダイレクト。`manager` 専用ページへの `sales` アクセスはサーバーサイドでブロック。
 
-| カラム | 型 | 制約 | 説明 |
-| --- | --- | --- | --- |
-| id | bigint | PK | |
-| name | varchar | NOT NULL | 顧客名・会社名 |
-| contact_name | varchar | | 担当者名 |
-| phone / email | varchar | | |
-| created_at / updated_at | timestamp | NOT NULL | |
+```mermaid
+flowchart LR
+    Browser["ブラウザ"]
 
-### `daily_reports`（日報）
+    subgraph Vercel["Vercel — Next.js App Router"]
+        MW["Middleware\nNextAuth.js 認証ガード"]
+        Pages["Server Components\n画面レンダリング"]
+        API["Route Handlers\napp/api/"]
+    end
 
-| カラム | 型 | 制約 | 説明 |
-| --- | --- | --- | --- |
-| id | bigint | PK | |
-| user_id | bigint | FK → users, NOT NULL | 作成した営業 |
-| report_date | date | NOT NULL | 日報対象日 |
-| problem_text | text | | 課題・相談 |
-| plan_text | text | | 明日やること |
-| problem_comment_text | text | nullable | Problem への上長コメント |
-| problem_comment_by | bigint | FK → users, nullable | |
-| problem_commented_at | timestamp | nullable | |
-| plan_comment_text | text | nullable | Plan への上長コメント |
-| plan_comment_by | bigint | FK → users, nullable | |
-| plan_commented_at | timestamp | nullable | |
-| created_at / updated_at | timestamp | NOT NULL | |
+    DB[("PostgreSQL")]
 
-UNIQUE: `(user_id, report_date)` — 1ユーザー×1日で1件
-
-### `visit_records`（訪問記録）
-
-| カラム | 型 | 制約 | 説明 |
-| --- | --- | --- | --- |
-| id | bigint | PK | |
-| daily_report_id | bigint | FK → daily_reports, NOT NULL | |
-| customer_id | bigint | FK → customers, NOT NULL | |
-| visited_at | timestamp | NOT NULL | 訪問日時 |
-| content | text | NOT NULL | 訪問内容 |
-| created_at / updated_at | timestamp | NOT NULL | |
+    Browser -->|"リクエスト"| MW
+    MW -->|"認証済み"| Pages
+    MW -->|"認証済み"| API
+    Pages -->|"Prisma"| DB
+    API -->|"Prisma"| DB
+```
 
 ## ER図
 
@@ -127,37 +106,58 @@ erDiagram
     customers ||--o{ visit_records : "訪問先"
 ```
 
-## 技術スタック
+## テーブル定義
 
-| カテゴリ | 採用技術 | 備考 |
-| --- | --- | --- |
-| フレームワーク | Next.js（TypeScript） | App Router。フロント・API を一体管理 |
-| DB / ORM | PostgreSQL + Prisma | 型安全スキーマ・マイグレーション管理 |
-| 認証 | NextAuth.js | middleware でセッション検証・ロールガード |
-| ホスティング | Vercel | CI/CD・プレビューデプロイ込み |
+### `users`（営業マスタ）
 
-API は `app/api/` Route Handlers（REST）。未認証は `/login` へリダイレクト。`manager` 専用ページへの `sales` アクセスはサーバーサイドでブロック。
+| カラム | 型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| id | bigint | PK | |
+| name | varchar | NOT NULL | |
+| email | varchar | NOT NULL, UNIQUE | ログインID |
+| password_hash | varchar | NOT NULL | |
+| role | enum | NOT NULL | `sales` / `manager` |
+| created_at / updated_at | timestamp | NOT NULL | |
 
-## アーキテクチャ
+### `customers`（顧客マスタ）
 
-```mermaid
-flowchart LR
-    Browser["ブラウザ"]
+| カラム | 型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| id | bigint | PK | |
+| name | varchar | NOT NULL | 顧客名・会社名 |
+| contact_name | varchar | | 担当者名 |
+| phone / email | varchar | | |
+| created_at / updated_at | timestamp | NOT NULL | |
 
-    subgraph Vercel["Vercel — Next.js App Router"]
-        MW["Middleware\nNextAuth.js 認証ガード"]
-        Pages["Server Components\n画面レンダリング"]
-        API["Route Handlers\napp/api/"]
-    end
+### `daily_reports`（日報）
 
-    DB[("PostgreSQL")]
+| カラム | 型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| id | bigint | PK | |
+| user_id | bigint | FK → users, NOT NULL | 作成した営業 |
+| report_date | date | NOT NULL | 日報対象日 |
+| problem_text | text | | 課題・相談 |
+| plan_text | text | | 明日やること |
+| problem_comment_text | text | nullable | Problem への上長コメント |
+| problem_comment_by | bigint | FK → users, nullable | |
+| problem_commented_at | timestamp | nullable | |
+| plan_comment_text | text | nullable | Plan への上長コメント |
+| plan_comment_by | bigint | FK → users, nullable | |
+| plan_commented_at | timestamp | nullable | |
+| created_at / updated_at | timestamp | NOT NULL | |
 
-    Browser -->|"リクエスト"| MW
-    MW -->|"認証済み"| Pages
-    MW -->|"認証済み"| API
-    Pages -->|"Prisma"| DB
-    API -->|"Prisma"| DB
-```
+UNIQUE: `(user_id, report_date)` — 1ユーザー×1日で1件
+
+### `visit_records`（訪問記録）
+
+| カラム | 型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| id | bigint | PK | |
+| daily_report_id | bigint | FK → daily_reports, NOT NULL | |
+| customer_id | bigint | FK → customers, NOT NULL | |
+| visited_at | timestamp | NOT NULL | 訪問日時 |
+| content | text | NOT NULL | 訪問内容 |
+| created_at / updated_at | timestamp | NOT NULL | |
 
 ## 設計決定事項
 
