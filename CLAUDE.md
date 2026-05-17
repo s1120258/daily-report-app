@@ -6,10 +6,11 @@
 
 @docs/superpowers/specs/DESIGN.md
 
-その他の仕様書:
-- 画面定義: `docs/superpowers/specs/SCREENS.md`
-- API仕様: `docs/superpowers/specs/API.md`
-- テスト仕様: `docs/superpowers/specs/TESTS.md`
+タスクに応じて作業開始前に該当ファイルを読むこと:
+
+- 画面・UI の実装時 → `docs/superpowers/specs/SCREENS.md`
+- API Route Handler の実装時 → `docs/superpowers/specs/API.md`
+- テストの作成時 → `docs/superpowers/specs/TESTS.md`
 
 ## 技術スタック
 
