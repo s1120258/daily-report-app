@@ -138,6 +138,27 @@ erDiagram
 
 API は `app/api/` Route Handlers（REST）。未認証は `/login` へリダイレクト。`manager` 専用ページへの `sales` アクセスはサーバーサイドでブロック。
 
+## アーキテクチャ
+
+```mermaid
+flowchart LR
+    Browser["ブラウザ"]
+
+    subgraph Vercel["Vercel — Next.js App Router"]
+        MW["Middleware\nNextAuth.js 認証ガード"]
+        Pages["Server Components\n画面レンダリング"]
+        API["Route Handlers\napp/api/"]
+    end
+
+    DB[("PostgreSQL")]
+
+    Browser -->|"リクエスト"| MW
+    MW -->|"認証済み"| Pages
+    MW -->|"認証済み"| API
+    Pages -->|"Prisma"| DB
+    API -->|"Prisma"| DB
+```
+
 ## 設計決定事項
 
 | 決定 | 理由 |
