@@ -17,7 +17,8 @@
 - **Framework**: Next.js (TypeScript, App Router)
 - **DB / ORM**: PostgreSQL + Prisma
 - **認証**: NextAuth.js
-- **ホスティング**: Vercel
+- **ホスティング**: Google Cloud Run
+- **CI/CD**: GitHub Actions（typecheck / lint / format / test）
 
 ## コーディング規約
 

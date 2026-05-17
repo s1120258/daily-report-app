@@ -36,7 +36,8 @@
 | フレームワーク | Next.js（TypeScript） | App Router。フロント・API を一体管理 |
 | DB / ORM | PostgreSQL + Prisma | 型安全スキーマ・マイグレーション管理 |
 | 認証 | NextAuth.js | middleware でセッション検証・ロールガード |
-| ホスティング | Vercel | CI/CD・プレビューデプロイ込み |
+| ホスティング | Google Cloud Run | Dockerfile ベース・Cloud SQL（PostgreSQL） |
+| CI/CD | GitHub Actions | PR・main push で typecheck / lint / format / test |
 
 ## アーキテクチャ
 
@@ -46,7 +47,7 @@ API は `app/api/` Route Handlers（REST）。未認証は `/login` へリダイ
 flowchart LR
     Browser["ブラウザ"]
 
-    subgraph Vercel["Vercel — Next.js App Router"]
+    subgraph GCR["Google Cloud Run — Next.js"]
         MW["Middleware\nNextAuth.js 認証ガード"]
         Pages["Server Components\n画面レンダリング"]
         API["Route Handlers\napp/api/"]
@@ -175,3 +176,4 @@ UNIQUE: `(user_id, report_date)` — 1ユーザー×1日で1件
 | `visit_records` に `visited_at` を持つ | 1日複数訪問の順序を記録するため |
 | `(user_id, report_date)` のユニーク制約 | 1ユーザー×1日1件を保証 |
 | 承認フローなし | コメントのみで十分、シンプルさを優先 |
+| Google Cloud Run を採用 | コンテナ単位でスケール可能・Vercel 依存を回避 |

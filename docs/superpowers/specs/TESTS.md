@@ -4,10 +4,11 @@
 
 | 種別 | ツール | 対象 |
 | --- | --- | --- |
-| 統合テスト（API） | Jest + Supertest | Route Handlers の権限制御・ビジネスロジック・DB連携 |
+| 単体テスト | Vitest | ユーティリティ・純粋関数（`lib/utils.ts`, `lib/session.ts`） |
+| 統合テスト（API） | Jest | Route Handlers の権限制御・ビジネスロジック・DB連携 |
 | E2Eテスト | Playwright | 主要ユーザーフローのブラウザ操作 |
 
-単体テストはユーティリティ・バリデーション関数が増えた際に追加する。
+Vitest はテスト DB 不要。Jest は `.env.test` の専用 PostgreSQL を使用。
 
 ## テストデータ
 
@@ -22,6 +23,26 @@
 | 3 | sales | sales-b@test.com |
 
 **顧客 fixture**: ID=10（株式会社テストA）、ID=11（株式会社テストB）
+
+## 単体テスト（Vitest）
+
+P 列: H=高優先 / M=中 / L=低
+
+### `lib/utils.ts`
+
+| TC | テストケース | 期待結果 | P |
+| --- | --- | --- | --- |
+| UT-01 | `serializeId(BigInt(123))` | `"123"` | M |
+| UT-02 | `formatDate(new Date("2026-05-17T10:00:00Z"))` | `"2026-05-17"` | M |
+
+### `lib/session.ts`
+
+| TC | テストケース | 期待結果 | P |
+| --- | --- | --- | --- |
+| UT-03 | セッションなしで `getSessionUser()` を呼ぶ | `null` を返す | H |
+| UT-04 | セッションありで `getSessionUser()` を呼ぶ | `{ id, role }` オブジェクトを返す | H |
+
+---
 
 ## 統合テスト（API）
 

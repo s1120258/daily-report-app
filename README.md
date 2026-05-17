@@ -11,12 +11,12 @@
 
 ## 技術スタック
 
-| カテゴリ | 技術 |
-| --- | --- |
+| カテゴリ       | 技術                                 |
+| -------------- | ------------------------------------ |
 | フレームワーク | Next.js 14+ (TypeScript, App Router) |
-| DB / ORM | PostgreSQL + Prisma |
-| 認証 | NextAuth.js |
-| ホスティング | Vercel |
+| DB / ORM       | PostgreSQL + Prisma                  |
+| 認証           | NextAuth.js                          |
+| ホスティング   | Google Cloud Run                     |
 
 ## セットアップ
 
@@ -36,9 +36,9 @@ npm run dev
 
 ## ドキュメント
 
-| ドキュメント | 説明 |
-| --- | --- |
-| [DESIGN.md](docs/superpowers/specs/DESIGN.md) | システム設計・ER図・テーブル定義・アーキテクチャ |
-| [SCREENS.md](docs/superpowers/specs/SCREENS.md) | 画面定義・画面遷移図 |
-| [API.md](docs/superpowers/specs/API.md) | API仕様 |
-| [TESTS.md](docs/superpowers/specs/TESTS.md) | テスト仕様 |
+| ドキュメント                                    | 説明                                             |
+| ----------------------------------------------- | ------------------------------------------------ |
+| [DESIGN.md](docs/superpowers/specs/DESIGN.md)   | システム設計・ER図・テーブル定義・アーキテクチャ |
+| [SCREENS.md](docs/superpowers/specs/SCREENS.md) | 画面定義・画面遷移図                             |
+| [API.md](docs/superpowers/specs/API.md)         | API仕様                                          |
+| [TESTS.md](docs/superpowers/specs/TESTS.md)     | テスト仕様                                       |
