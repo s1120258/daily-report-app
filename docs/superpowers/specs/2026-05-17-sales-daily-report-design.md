@@ -149,7 +149,25 @@ erDiagram
 
 ---
 
-## 6. 設計上の決定事項
+## 6. 技術スタック
+
+| カテゴリ | 採用技術 | 選定理由 |
+| --- | --- | --- |
+| フレームワーク | Next.js（TypeScript） | フロント・API・SSR を1プロジェクトで管理。App Router でサーバーコンポーネントを活用 |
+| データベース | PostgreSQL | リレーショナルデータに適しており、Prisma との相性が良い |
+| ORM | Prisma | 型安全なスキーマ定義とクエリ。マイグレーション管理も一体 |
+| 認証 | NextAuth.js（Auth.js） | Next.js 向け認証ライブラリ。セッション管理・ロールガードを簡潔に実装できる |
+| ホスティング | Vercel | Next.js との親和性が最高。CI/CD・プレビューデプロイが標準搭載 |
+
+### アーキテクチャ方針
+
+- **API**: Next.js の Route Handlers（`app/api/`）で REST API を実装
+- **認証ガード**: NextAuth.js のセッションを middleware で検証し、未認証時は `/login` へリダイレクト
+- **ロール制御**: セッションの `role` フィールドを参照し、`manager` 専用ページへの `sales` のアクセスを server-side でブロック
+
+---
+
+## 7. 設計上の決定事項
 
 | 決定 | 理由 |
 |---|---|
